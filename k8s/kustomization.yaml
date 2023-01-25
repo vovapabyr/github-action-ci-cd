@@ -8,4 +8,4 @@ namespace: hello-gitops
 images:
 - name: hello-gitops
   newName: pabyrivskyiv/hello-gitops
-  newTag: a0adf74c459397dc59feb9cd48e2ea23559c93ab
+  newTag: fef25fa1e9ee817dd377916a3a20e5a40cd54a44
