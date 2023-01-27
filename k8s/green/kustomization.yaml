@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
 - deployment-green.yaml
 - service-green.yaml
-- ingress.yaml
+- ../ingress.yaml
 images:
 - name: hello-gitops
   newName: pabyrivskyiv/hello-gitops
