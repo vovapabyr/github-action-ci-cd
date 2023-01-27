@@ -117,8 +117,8 @@ jobs:
     - name: Create namespace & set in Kustomize
       run: |
          namespacePresentBlue=`kubectl get deploy | grep hello-gitops-blue | wc -l`
-         namespacePresentGreen=`kubectl get deploy | grep hello-gitops-green | wc -l`
          echo $namespacePresentBlue
+         namespacePresentGreen=`kubectl get deploy | grep hello-gitops-green | wc -l`
          echo $namespacePresentGreen
          if [ $namespacePresentBlue -eq 0 ]
          then
