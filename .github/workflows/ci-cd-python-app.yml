@@ -136,6 +136,7 @@ jobs:
             echo "Both Blue and Green namespaces are present! Exiting"
             exit 1
          fi
+         echo ${{ env.KUZ_DIR }}
          cat k8s/${{ env.KUZ_DIR }}/kustomization.yaml 
 
     - name: Update Kubernetes resources
