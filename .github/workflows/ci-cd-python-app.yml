@@ -122,11 +122,13 @@ jobs:
          echo $namespacePresentGreen
          if [ $namespacePresentBlue -eq 0 ]
          then
+            echo "Deploying Green!"
             echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
             echo "KUZ_DIR=blue" >> $GITHUB_ENV
          elif [ $namespacePresentGreen -eq 0 ]
          then
+            echo "Deploying Blue!"
             echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
             echo "KUZ_DIR=green" >> $GITHUB_ENV
