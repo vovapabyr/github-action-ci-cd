@@ -81,6 +81,7 @@ jobs:
       PROJECT_ID: ${{ secrets.GKE_PROJECT }}
       GKE_CLUSTER: autopilot-cluster-1    # TODO: update to cluster name
       GKE_REGION: us-central1	   # TODO: update to cluster region
+      KUZ_DIR: blue
 
     steps:
     - name: Check out code
@@ -125,20 +126,19 @@ jobs:
             echo "Deploying Green!"
             echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
-            echo "KUZ_DIR=blue" >> $GITHUB_ENV
+            export KUZ_DIR=blue
          elif [ $namespacePresentGreen -eq 0 ]
          then
             echo "Deploying Blue!"
             echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
-            echo "KUZ_DIR=green" >> $GITHUB_ENV
+            export KUZ_DIR=green
          else
             echo "Both Blue and Green namespaces are present! Exiting"
             exit 1
          fi
-         echo ${{ env.OLD_NAMESPACE }}
-         echo $GITHUB_ENV
-         cat k8s/${{ env.KUZ_DIR }}/kustomization.yaml 
+         echo $KUZ_DIR
+         cat k8s/$KUZ_DIR/kustomization.yaml 
 
     - name: Update Kubernetes resources
       env:
