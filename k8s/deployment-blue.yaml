@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: hello-gitops-blue
+  name: hello-gitops-blue
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: hello-gitops-blue
+  template:
+    metadata:
+      labels:
+        app: hello-gitops-blue
+    spec:
+      containers:
+        - image: hello-gitops
+          name: hello-gitops
+          ports:
+            - name: http
+              containerPort: 8050

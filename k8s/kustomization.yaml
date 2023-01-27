@@ -1,11 +1,26 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- deployment.yaml
-- service.yaml
+- deployment-blue.yaml
+- service-blue.yaml
 - ingress.yaml
-namespace: python-app-blue
 images:
 - name: hello-gitops
   newName: pabyrivskyiv/hello-gitops
   newTag: 102f35e58e463f6975749568bf4c38b7561f2f57
+
+patchesJson6902:
+- target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: hello-gitops
+  path: ingress-patch.yaml
+
+patches:
+- patch: '[{"op": "replace", "path": "/spec/rules[0]/http/paths[0]/backend/service/name", "value": "hello-gitops-blue"}]'
+  target:
+    group: networking.k8s.io
+    version: v1
+    kind: Ingress
+    name: hello-gitops

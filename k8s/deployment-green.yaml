@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: hello-gitops
-  name: hello-gitops
+    app: hello-gitops-green
+  name: hello-gitops-green
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: hello-gitops
+      app: hello-gitops-green
   template:
     metadata:
       labels:
-        app: hello-gitops
+        app: hello-gitops-green
     spec:
       containers:
         - image: hello-gitops

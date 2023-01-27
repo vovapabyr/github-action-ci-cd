@@ -10,6 +10,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: hello-gitops
+                name: hello-gitops-blue
                 port: 
                   number: 8050

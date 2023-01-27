@@ -116,26 +116,27 @@ jobs:
          
     - name: Create namespace & set in Kustomize
       run: |
-         namespacePresentBlue=`kubectl get ns | grep python-app-blue | wc -l`
-         namespacePresentGreen=`kubectl get ns | grep python-app-green | wc -l`
+         namespacePresentBlue=`kubectl get deploy | grep hello-gitops-blue | wc -l`
+         namespacePresentGreen=`kubectl get deploy | grep hello-gitops-green | wc -l`
          if [ $namespacePresentBlue -eq 0 ]
          then
-            kubectl create ns python-app-blue
             cd k8s
-            kustomize edit set namespace python-app-blue
-            echo "NEW_NAMESPACE=python-app-blue" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=python-app-green" >> $GITHUB_ENV
+            kustomize edit set resource deployment-green.yaml=deployment-blue.yaml
+            kustomize edit add patch --group: networking.k8s.io --version: v1 --kind: Ingress --name: hello-gitops --patch "[{\"op\": \"replace\", \"path\": \"/spec/rules[0]/http/paths[0]/backend/service/name\", \"value\": \"hello-gitops-blue\"}]"
+            echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
+            echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
          elif [ $namespacePresentGreen -eq 0 ]
          then
-            kubectl create ns python-app-green
             cd k8s
-            kustomize edit set namespace python-app-green
-            echo "NEW_NAMESPACE=python-app-green" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=python-app-blue" >> $GITHUB_ENV
+            kustomize edit set resource deployment-blue.yaml=deployment-green.yaml
+            kustomize edit add patch --group: networking.k8s.io --version: v1 --kind: Ingress --name: hello-gitops --patch "[{\"op\": \"replace\", \"path\": \"/spec/rules[0]/http/paths[0]/backend/service/name\", \"value\": \"hello-gitops-blue\"}]"
+            echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
+            echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
          else
             echo "Both Blue and Green namespaces are present! Exiting"
             exit 1
          fi
+         cat kustomization.yaml
 
     - name: Update Kubernetes resources
       env:
@@ -157,10 +158,11 @@ jobs:
     # REMOVE OLD DEPLOYMENT!!
     - name: Remove old namespace
       run: |
-        namespacePresentOld=`kubectl get ns | grep ${{ env.OLD_NAMESPACE }} | wc -l`
+        namespacePresentOld=`kubectl get deploy | grep ${{ env.OLD_NAMESPACE }} | wc -l`
         if [ $namespacePresentOld -eq 1 ]
         then
-          kubectl delete ns ${{ env.OLD_NAMESPACE }} --wait=true
+          kubectl delete deploy ${{ env.OLD_NAMESPACE }} --wait=true
+          kubectl delete service ${{ env.OLD_NAMESPACE }} --wait=true
         fi
  
     - name: Commit files
