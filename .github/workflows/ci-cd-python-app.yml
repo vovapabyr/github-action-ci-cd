@@ -118,6 +118,8 @@ jobs:
       run: |
          namespacePresentBlue=`kubectl get deploy | grep hello-gitops-blue | wc -l`
          namespacePresentGreen=`kubectl get deploy | grep hello-gitops-green | wc -l`
+         echo $namespacePresentBlue
+         echo $namespacePresentGreen
          if [ $namespacePresentBlue -eq 0 ]
          then
             echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
