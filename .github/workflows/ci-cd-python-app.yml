@@ -137,7 +137,7 @@ jobs:
             exit 1
          fi
          echo ${{ env.OLD_NAMESPACE }}
-         echo ${{ env.KUZ_DIR }}
+         echo $GITHUB_ENV
          cat k8s/${{ env.KUZ_DIR }}/kustomization.yaml 
 
     - name: Update Kubernetes resources
