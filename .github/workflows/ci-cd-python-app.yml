@@ -124,14 +124,14 @@ jobs:
          then
             echo "Deploying Blue!"
             cd k8s
-            kubectl patch ing/main-ingress --type=json -p='[{"op": "replace", "path": "/spec/rules[0]/http/paths[0]/backend/service/name", "value":"hello-gitops-blue"}]'
+            kubectl patch ing/hello-gitops --type=json -p='[{"op": "replace", "path": "/spec/rules[0]/http/paths[0]/backend/service/name", "value":"hello-gitops-blue"}]'
             echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
          elif [ $namespacePresentGreen -eq 0 ]
          then
             echo "Deploying Green!"
             cd k8s
-            kubectl patch ing/main-ingress --type=json -p='[{"op": "replace", "path": "/spec/rules[0]/http/paths[0]/backend/service/name", "value":"hello-gitops-green"}]'
+            kubectl patch ing/hello-gitops --type=json -p='[{"op": "replace", "path": "/spec/rules[0]/http/paths[0]/backend/service/name", "value":"hello-gitops-green"}]'
             echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
          else
