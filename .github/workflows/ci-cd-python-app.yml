@@ -151,15 +151,14 @@ jobs:
         service=`kubectl get service | grep hello-gitops | wc -l`
         if [ $service -eq 0 ]
         then
-          echo ${PWD}
           echo "Creating service"
-          kubectl apply -f service.yaml
+          kubectl apply -f k8s/service.yaml
         fi
         ingress=`kubectl get service | grep hello-gitops | wc -l`
         if [ $ingress -eq 0 ]
         then
           echo "Creating ingress"
-          kubectl apply -f ingress.yaml
+          kubectl apply -f k8s/ingress.yaml
         fi
         kubectl rollout status deploy/${{ env.NEW_DEPLOY }}
         kubectl patch service hello-gitops -p '{"spec":{"selector":{"app":"${{ env.NEW_DEPLOY }}"}}}'
