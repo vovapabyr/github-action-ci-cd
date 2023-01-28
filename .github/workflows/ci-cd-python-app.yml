@@ -154,7 +154,7 @@ jobs:
           echo "Creating service"
           kubectl apply -f k8s/service.yaml
         fi
-        ingress=`kubectl get service | grep hello-gitops | wc -l`
+        ingress=`kubectl get ingress | grep hello-gitops | wc -l`
         if [ $ingress -eq 0 ]
         then
           echo "Creating ingress"
