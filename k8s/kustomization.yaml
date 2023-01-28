@@ -9,7 +9,7 @@ resources:
 images:
 - name: hello-gitops
   newName: pabyrivskyiv/hello-gitops
-  newTag: 432160a05a18a6195dfe008fbdb2bf5be636de88
+  newTag: 174681a3b1e9b176ea5ac5aa508957d5b43e7239
 
 patches:
 - patch: '[{"op": "replace", "path": "/spec/rules/0/http/paths/0/backend/service/name",
@@ -20,6 +20,10 @@ patches:
     name: hello-gitops
     version: v1
 - path: ingress-patch-blue.json
+  target:
+    kind: Ingress
+    name: hello-gitops
+- path: ingress-patch-green.json
   target:
     kind: Ingress
     name: hello-gitops
