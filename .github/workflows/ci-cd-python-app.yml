@@ -151,6 +151,7 @@ jobs:
         service=`kubectl get service | grep hello-gitops | wc -l`
         if [ $service -eq 0 ]
         then
+          echo ${PWD}
           echo "Creating service"
           kubectl apply -f service.yaml
         fi
