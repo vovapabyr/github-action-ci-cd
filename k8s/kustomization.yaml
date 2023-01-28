@@ -3,15 +3,9 @@ kind: Kustomization
 resources:
 - deployment-blue.yaml
 - deployment-green.yaml
-- service-blue.yaml
-- service-green.yaml
+- service.yaml
 - ingress.yaml
 images:
 - name: hello-gitops
   newName: pabyrivskyiv/hello-gitops
   newTag: 2b1931e826839608fd47e90dac4a9d9d53e899f2
-patches:
-- path: ingress-patch-blue.json
-  target:
-    kind: Ingress
-    name: hello-gitops

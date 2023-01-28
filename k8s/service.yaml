@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: hello-gitops-blue
-  name: hello-gitops-blue
+    app: hello-gitops
+  name: hello-gitops
 spec:
   ports:
     - name: http
