@@ -123,15 +123,11 @@ jobs:
          if [ $namespacePresentBlue -eq 0 ]
          then
             echo "Deploying Blue!"
-            cd k8s
-            kustomize edit add patch --kind Service --name hello-gitops --path ingress-patch-blue.json
             echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
          elif [ $namespacePresentGreen -eq 0 ]
          then
             echo "Deploying Green!"
-            cd k8s
-            kustomize edit add patch --kind Service --name hello-gitops --path ingress-patch-green.json
             echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
          else
@@ -150,6 +146,8 @@ jobs:
     - name: Deploy updated Kubernetes resources
       run: |
         kubectl apply -k k8s/
+        kubectl rollout status deploy/${{ env.NEW_NAMESPACE }}
+        kubectl patch service hello-gitops -p '{"spec":{"selector":{"app":"${{ env.NEW_NAMESPACE }}"}}}'
    
     # DO SOME CHECKS HERE BEFORE COMMIT
     #- name: Deploy updated Kubernetes resources
