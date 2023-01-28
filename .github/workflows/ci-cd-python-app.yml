@@ -123,15 +123,17 @@ jobs:
          if [ $namespacePresentBlue -eq 0 ]
          then
             echo "Deploying Blue!"
+            cd k8s
+            kustomize edit add patch --group: networking.k8s.io --version: v1 --kind: Ingress --name: hello-gitops --patch "[{\"op\": \"replace\", \"path\": \"/spec/rules[0]/http/paths[0]/backend/service/name\", \"value\": \"hello-gitops-blue\"}]"
             echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
-            echo "KUZ_DIR=blue" >> $GITHUB_ENV
          elif [ $namespacePresentGreen -eq 0 ]
          then
             echo "Deploying Green!"
+            cd k8s
+            kustomize edit add patch --group: networking.k8s.io --version: v1 --kind: Ingress --name: hello-gitops --patch "[{\"op\": \"replace\", \"path\": \"/spec/rules[0]/http/paths[0]/backend/service/name\", \"value\": \"hello-gitops-green\"}]"
             echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
-            echo "KUZ_DIR=green" >> $GITHUB_ENV
          else
             echo "Both Blue and Green namespaces are present! Exiting"
             exit 1
@@ -141,13 +143,13 @@ jobs:
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       run: |
-       cd k8s/${{ env.KUZ_DIR }}
+       cd k8s
        kustomize edit set image hello-gitops=$DOCKER_USERNAME/hello-gitops:$GITHUB_SHA
        cat kustomization.yaml
     
     - name: Deploy updated Kubernetes resources
       run: |
-        kubectl apply -k k8s/${{ env.KUZ_DIR }}/kustomization.yaml 
+        kubectl apply -k k8s/
    
     # DO SOME CHECKS HERE BEFORE COMMIT
     #- name: Deploy updated Kubernetes resources
