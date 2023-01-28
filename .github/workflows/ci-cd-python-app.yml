@@ -114,26 +114,24 @@ jobs:
          echo "##vso[task.setvariable variable=USE_GKE_GCLOUD_AUTH_PLUGIN]True"
          gcloud components list
          
-    - name: Create namespace & set in Kustomize
+    - name: Check existing deployment
       run: |
-         namespacePresentBlue=`kubectl get deploy | grep hello-gitops-blue | wc -l`
-         echo $namespacePresentBlue
-         namespacePresentGreen=`kubectl get deploy | grep hello-gitops-green | wc -l`
-         echo $namespacePresentGreen
-         if [ $namespacePresentBlue -eq 0 ]
+         deploymentBlue=`kubectl get deploy | grep hello-gitops-blue | wc -l`
+         deploymentGreen=`kubectl get deploy | grep hello-gitops-green | wc -l`
+         if [ $deploymentBlue -eq 0 ]
          then
-            echo "Deploying Blue!"
-            echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
-            echo "RES_DIR=blue" >> $GITHUB_ENV
-         elif [ $namespacePresentGreen -eq 0 ]
+            echo "Deploying Blue"
+            echo "NEW_DEPLOY=hello-gitops-blue" >> $GITHUB_ENV
+            echo "OLD_DEPLOY=hello-gitops-green" >> $GITHUB_ENV
+            echo "KUZ_RESOURCE_DIR=blue" >> $GITHUB_ENV
+         elif [ $deploymentGreen -eq 0 ]
          then
-            echo "Deploying Green!"
-            echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
-            echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
-            echo "RES_DIR=green" >> $GITHUB_ENV
+            echo "Deploying Green"
+            echo "NEW_DEPLOY=hello-gitops-green" >> $GITHUB_ENV
+            echo "OLD_DEPLOY=hello-gitops-blue" >> $GITHUB_ENV
+            echo "KUZ_RESOURCE_DIR=green" >> $GITHUB_ENV
          else
-            echo "Both Blue and Green namespaces are present! Exiting"
+            echo "Both Blue and Green deployments are present! Exiting"
             exit 1
          fi
 
@@ -141,15 +139,17 @@ jobs:
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       run: |
-       cd k8s/${{ env.RES_DIR }}
+       echo "Updating ${{ env.NEW_DEPLOY }}"
+       cd k8s/${{ env.KUZ_RESOURCE_DIR }}
        kustomize edit set image hello-gitops=$DOCKER_USERNAME/hello-gitops:$GITHUB_SHA
        cat kustomization.yaml
     
     - name: Deploy updated Kubernetes resources
       run: |
-        kubectl apply -k k8s/${{ env.RES_DIR }}
-        deploymentService=`kubectl get service | grep hello-gitops | wc -l`
-        if [ $deploymentService -eq 0 ]
+        echo "Deploying ${{ env.NEW_DEPLOY }} with new image"
+        kubectl apply -k k8s/${{ env.KUZ_RESOURCE_DIR }}
+        service=`kubectl get service | grep hello-gitops | wc -l`
+        if [ $service -eq 0 ]
         then
           echo "Creating service"
           kubectl apply -f service.yaml
@@ -160,8 +160,8 @@ jobs:
           echo "Creating ingress"
           kubectl apply -f ingress.yaml
         fi
-        kubectl rollout status deploy/${{ env.NEW_NAMESPACE }}
-        kubectl patch service hello-gitops -p '{"spec":{"selector":{"app":"${{ env.NEW_NAMESPACE }}"}}}'
+        kubectl rollout status deploy/${{ env.NEW_DEPLOY }}
+        kubectl patch service hello-gitops -p '{"spec":{"selector":{"app":"${{ env.NEW_DEPLOY }}"}}}'
    
     # DO SOME CHECKS HERE BEFORE COMMIT
     #- name: Deploy updated Kubernetes resources
@@ -169,13 +169,12 @@ jobs:
     #    kubectl apply -k k8s/
 
     # REMOVE OLD DEPLOYMENT!!
-    - name: Remove old namespace
+    - name: Remove old deployment
       run: |
-        namespacePresentOld=`kubectl get deploy | grep ${{ env.OLD_NAMESPACE }} | wc -l`
-        if [ $namespacePresentOld -eq 1 ]
+        deploymentOld=`kubectl get deploy | grep ${{ env.OLD_DEPLOY }} | wc -l`
+        if [ $deploymentOld -eq 1 ]
         then
-          kubectl delete deploy ${{ env.OLD_NAMESPACE }} --wait=true
-          kubectl delete service ${{ env.OLD_NAMESPACE }} --wait=true
+          kubectl delete deploy ${{ env.OLD_DEPLOY }} --wait=true
         fi
  
     - name: Commit files
