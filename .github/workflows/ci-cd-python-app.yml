@@ -125,11 +125,13 @@ jobs:
             echo "Deploying Blue!"
             echo "NEW_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
+            echo "RES_DIR=blue" >> $GITHUB_ENV
          elif [ $namespacePresentGreen -eq 0 ]
          then
             echo "Deploying Green!"
             echo "NEW_NAMESPACE=hello-gitops-green" >> $GITHUB_ENV
             echo "OLD_NAMESPACE=hello-gitops-blue" >> $GITHUB_ENV
+            echo "RES_DIR=green" >> $GITHUB_ENV
          else
             echo "Both Blue and Green namespaces are present! Exiting"
             exit 1
@@ -139,13 +141,25 @@ jobs:
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       run: |
-       cd k8s
+       cd k8s/${{ env.RES_DIR }}
        kustomize edit set image hello-gitops=$DOCKER_USERNAME/hello-gitops:$GITHUB_SHA
        cat kustomization.yaml
     
     - name: Deploy updated Kubernetes resources
       run: |
-        kubectl apply -k k8s/
+        kubectl apply -k k8s/${{ env.RES_DIR }}
+        deploymentService=`kubectl get service | grep hello-gitops | wc -l`
+        if [ $deploymentService -eq 0 ]
+        then
+          echo "Creating service"
+          kubectl apply -f service.yaml
+        fi
+        ingress=`kubectl get service | grep hello-gitops | wc -l`
+        if [ $ingress -eq 0 ]
+        then
+          echo "Creating ingress"
+          kubectl apply -f ingress.yaml
+        fi
         kubectl rollout status deploy/${{ env.NEW_NAMESPACE }}
         kubectl patch service hello-gitops -p '{"spec":{"selector":{"app":"${{ env.NEW_NAMESPACE }}"}}}'
    

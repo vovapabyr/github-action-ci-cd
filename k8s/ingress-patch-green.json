@@ -1,7 +1,0 @@
-[
-    {
-        "op": "replace",
-        "path": "/spec/selector/app",
-        "value": "hello-gitops-green"
-    }
-]
