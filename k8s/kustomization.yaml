@@ -9,4 +9,9 @@ resources:
 images:
 - name: hello-gitops
   newName: pabyrivskyiv/hello-gitops
-  newTag: 174681a3b1e9b176ea5ac5aa508957d5b43e7239
+  newTag: 2b1931e826839608fd47e90dac4a9d9d53e899f2
+patches:
+- path: ingress-patch-blue.json
+  target:
+    kind: Ingress
+    name: hello-gitops
