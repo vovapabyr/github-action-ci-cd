@@ -147,7 +147,7 @@ jobs:
     
     - name: Deploy updated Kubernetes resources
       run: |
-        kubectl apply -k k8s/${{ env.KUZ_DIR }} 
+        kubectl apply -k k8s/${{ env.KUZ_DIR }}/kustomization.yaml 
    
     # DO SOME CHECKS HERE BEFORE COMMIT
     #- name: Deploy updated Kubernetes resources
