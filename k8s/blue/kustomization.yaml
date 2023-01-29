@@ -5,4 +5,4 @@ resources:
 images:
 - name: hello-gitops
   newName: pabyrivskyiv/hello-gitops
-  newTag: b54553a550c3968ad8003fa96f3d9d4a2cde76a6
+  newTag: 88ab78e801aba6ea197b98389b6fe6f21e8a9ceb
